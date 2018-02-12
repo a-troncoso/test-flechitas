@@ -47,7 +47,8 @@ class Flechitas {
     this.cursor.y = y
 
     this.printArrows(this.cursor.x, this.cursor.y)
-    e.target.src = './img/5.jpg'
+    if (this.firstKeyPress)
+      this.firstKeyPress = !this.firstKeyPress
   }
 
   printArrows(x, y) {
@@ -86,6 +87,8 @@ class Flechitas {
         document.querySelectorAll("[data-x='" + xObliDownRight + "'][data-y='" + yObliDownRight + "']")[0].childNodes[0].src = './img/1.jpg'
       }
     }
+    document.querySelectorAll("[data-x='" + x + "'][data-y='" + y + "']")[0].childNodes[0].src = './img/5.jpg'
+    this.focusCursor(x, y)
   };
 
   pressArrow(e) {
@@ -102,7 +105,7 @@ class Flechitas {
           break;
         case 38:
           if (this.cursor.y > 0) {
-            this.cursor.x = this.cursor.x + 1
+            this.cursor.y = this.cursor.y - 1
           }
           break;
         case 39:
@@ -122,10 +125,12 @@ class Flechitas {
     }
     if (this.firstKeyPress)
       this.firstKeyPress = !this.firstKeyPress
-
-    console.log(this.cursor)
   }
 
+  focusCursor(x, y) {
+    document.querySelectorAll("[data-x='" + x + "'][data-y='" + y + "']")[0].className += ' focused'
+    document.querySelectorAll("[data-x='" + x + "'][data-y='" + y + "']")[0].childNodes[1].style.display = 'block'
+  }
 }
 window.onload = function() {
   const flechitas = new Flechitas();

@@ -22,13 +22,18 @@ body {
 	position: relative;
 }
 
-.grid .cell:hover {
+/*.grid .cell:hover {
   border: 1px solid cyan;
   border-radius: 5px;
-}
+}*/
 
 .grid .cell:hover .coord-label {
   display: block;
+}
+
+.grid .cell.focused {
+	border: 1px solid cyan;
+  border-radius: 5px;
 }
 
 .grid .cell .coord-label {
