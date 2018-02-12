@@ -8,6 +8,16 @@ class Flechitas {
       x: 0,
       y: 0
     };
+    this.cursor = {
+      current: {
+        x: 0,
+        y: 0
+      },
+      previous: {
+        x: 0,
+        y: 0
+      }
+    }
     const cells = JSON.parse(cellsModel)
     let cell = null,
       img = null,
@@ -32,23 +42,25 @@ class Flechitas {
 
     const cellElems = document.getElementsByClassName('cell');
     for (let cell of cellElems) {
-      cell.addEventListener("mouseover", this.onOverCell.bind(this));
+      cell.addEventListener('mouseover', this.onOverCell.bind(this));
     }
-    document.addEventListener("keydown", this.pressArrow.bind(this));
-
+    document.addEventListener('keydown', this.pressArrow.bind(this));
   }
 
   onOverCell(e) {
-    const parent = e.target.parentElement
-    const x = parseInt(parent.dataset.x)
-    const y = parseInt(parent.dataset.y)
+    const parent = e.target.parentElement;
+    const x = parseInt(parent.dataset.x);
+    const y = parseInt(parent.dataset.y);
 
-    this.cursor.x = x
-    this.cursor.y = y
+    this.cursor.previous.x = this.cursor.current.x;
+    this.cursor.previous.y = this.cursor.current.y;
 
-    this.printArrows(this.cursor.x, this.cursor.y)
+    this.cursor.current.x = x;
+    this.cursor.current.y = y;
+
+    this.printArrows(this.cursor.current.x, this.cursor.current.y);
     if (this.firstKeyPress)
-      this.firstKeyPress = !this.firstKeyPress
+      this.firstKeyPress = !this.firstKeyPress;
   }
 
   printArrows(x, y) {
@@ -92,6 +104,9 @@ class Flechitas {
   };
 
   pressArrow(e) {
+    this.cursor.previous.x = this.cursor.current.x;
+    this.cursor.previous.y = this.cursor.current.y;
+
     if (this.firstKeyPress) {
       if (e.keyCode === 37 || e.keyCode === 38 || e.keyCode === 39 || e.keyCode === 40) {
         this.printArrows(0, 0)
@@ -99,39 +114,43 @@ class Flechitas {
     } else {
       switch (e.keyCode) {
         case 37:
-          if (this.cursor.x > 0) {
-            this.cursor.x = this.cursor.x - 1
+          if (this.cursor.current.x > 0) {
+            this.cursor.current.x = this.cursor.current.x - 1
           }
           break;
         case 38:
-          if (this.cursor.y > 0) {
-            this.cursor.y = this.cursor.y - 1
+          if (this.cursor.current.y > 0) {
+            this.cursor.current.y = this.cursor.current.y - 1
           }
           break;
         case 39:
-          if (this.cursor.x < 9) {
-            this.cursor.x = this.cursor.x + 1
+          if (this.cursor.current.x < 9) {
+            this.cursor.current.x = this.cursor.current.x + 1
           }
           break;
         case 40:
-          if (this.cursor.y < 9) {
-            this.cursor.y = this.cursor.y + 1
+          if (this.cursor.current.y < 9) {
+            this.cursor.current.y = this.cursor.current.y + 1
           }
           break;
         default:
 
       }
-      this.printArrows(this.cursor.x, this.cursor.y)
+      this.printArrows(this.cursor.current.x, this.cursor.current.y)
     }
     if (this.firstKeyPress)
       this.firstKeyPress = !this.firstKeyPress
   }
 
   focusCursor(x, y) {
+    let className = document.querySelectorAll("[data-x='" + x + "'][data-y='" + y + "']")[0].className
+    className = className.replace(/focused/g, '');
+    document.querySelectorAll("[data-x='" + this.cursor.previous.x + "'][data-y='" + this.cursor.previous.y + "']")[0].className = className
+    document.querySelectorAll("[data-x='" + this.cursor.previous.x + "'][data-y='" + this.cursor.previous.y + "']")[0].childNodes[1].style.display = 'none'
     document.querySelectorAll("[data-x='" + x + "'][data-y='" + y + "']")[0].className += ' focused'
     document.querySelectorAll("[data-x='" + x + "'][data-y='" + y + "']")[0].childNodes[1].style.display = 'block'
   }
 }
-window.onload = function() {
+window.onload = function () {
   const flechitas = new Flechitas();
 }
