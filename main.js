@@ -5,10 +5,6 @@ class Flechitas {
   constructor() {
     this.firstKeyPress = true;
     this.cursor = {
-      x: 0,
-      y: 0
-    };
-    this.cursor = {
       current: {
         x: 0,
         y: 0
@@ -18,36 +14,41 @@ class Flechitas {
         y: 0
       }
     }
-    const cells = JSON.parse(cellsModel)
+
+    const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
+    const grid = document.getElementsByClassName('grid')[0];
     let cell = null,
       img = null,
       coordLabel = null,
       coordText = null;
-    const grid = document.getElementsByClassName('grid')[0]
-    for (let i = 0; i < cells.length; i++) {
-      cell = document.createElement('div');
-      cell.className = 'cell';
-      cell.dataset.x = cells[i].coords.x;
-      cell.dataset.y = cells[i].coords.y;
-      img = document.createElement('img');
-      img.src = './img/5.jpg';
-      coordLabel = document.createElement('div');
-      coordLabel.className = 'coord-label';
-      coordText = document.createTextNode(cells[i].label);
-      coordLabel.appendChild(coordText);
-      cell.appendChild(img)
-      cell.appendChild(coordLabel);
-      grid.appendChild(cell);
+
+    for (var i = 0; i < letters.length; i++) {
+      for (var j = 0; j < numbers.length; j++) {
+        cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.x = j;
+        cell.dataset.y = i;
+        img = document.createElement('img');
+        img.src = './img/5.jpg';
+        coordLabel = document.createElement('div');
+        coordLabel.className = 'coord-label';
+        coordText = document.createTextNode(numbers[j] + ', ' + letters[i]);
+        coordLabel.appendChild(coordText);
+        cell.appendChild(img)
+        cell.appendChild(coordLabel);
+        grid.appendChild(cell);
+
+        cell.addEventListener('mouseover', this.onOverCell.bind(this));
+      }
     }
 
-    const cellElems = document.getElementsByClassName('cell');
-    for (let cell of cellElems) {
-      cell.addEventListener('mouseover', this.onOverCell.bind(this));
-    }
     document.addEventListener('keydown', this.pressArrow.bind(this));
   }
 
+  // Evento que se ejecuta al pasar el mouse sobre una imagen
   onOverCell(e) {
+    if (e.target.classList[0] === 'cell') return
     const parent = e.target.parentElement;
     const x = parseInt(parent.dataset.x);
     const y = parseInt(parent.dataset.y);
@@ -63,6 +64,48 @@ class Flechitas {
       this.firstKeyPress = !this.firstKeyPress;
   }
 
+  // Evento que se ejecuta al presionar una tecla
+  pressArrow(e) {
+    this.cursor.previous.x = this.cursor.current.x;
+    this.cursor.previous.y = this.cursor.current.y;
+
+    // Si no se ha enfocado ninguna celda, y si se ha apretado alguna flecha =>se enfoca la primera celda
+    if (this.firstKeyPress) {
+      if (e.keyCode === 37 || e.keyCode === 38 || e.keyCode === 39 || e.keyCode === 40) {
+        this.printArrows(0, 0)
+      }
+    } else {
+      switch (e.keyCode) {
+        case 37: // left arrow
+          if (this.cursor.current.x > 0) {
+            this.cursor.current.x = this.cursor.current.x - 1
+          }
+          break;
+        case 38: // up arrow
+          if (this.cursor.current.y > 0) {
+            this.cursor.current.y = this.cursor.current.y - 1
+          }
+          break;
+        case 39: // right arros
+          if (this.cursor.current.x < 9) {
+            this.cursor.current.x = this.cursor.current.x + 1
+          }
+          break;
+        case 40: // down arrow
+          if (this.cursor.current.y < 9) {
+            this.cursor.current.y = this.cursor.current.y + 1
+          }
+          break;
+        default:
+
+      }
+      this.printArrows(this.cursor.current.x, this.cursor.current.y)
+    }
+    if (this.firstKeyPress)
+      this.firstKeyPress = !this.firstKeyPress
+  };
+
+  // Función que pinta las distintas flechas de la grilla
   printArrows(x, y) {
     for (let ySup = y; ySup >= 0; ySup--) {
       document.querySelectorAll("[data-x='" + x + "'][data-y='" + ySup + "']")[0].childNodes[0].src = './img/8.jpg'
@@ -103,54 +146,19 @@ class Flechitas {
     this.focusCursor(x, y)
   };
 
-  pressArrow(e) {
-    this.cursor.previous.x = this.cursor.current.x;
-    this.cursor.previous.y = this.cursor.current.y;
-
-    if (this.firstKeyPress) {
-      if (e.keyCode === 37 || e.keyCode === 38 || e.keyCode === 39 || e.keyCode === 40) {
-        this.printArrows(0, 0)
-      }
-    } else {
-      switch (e.keyCode) {
-        case 37:
-          if (this.cursor.current.x > 0) {
-            this.cursor.current.x = this.cursor.current.x - 1
-          }
-          break;
-        case 38:
-          if (this.cursor.current.y > 0) {
-            this.cursor.current.y = this.cursor.current.y - 1
-          }
-          break;
-        case 39:
-          if (this.cursor.current.x < 9) {
-            this.cursor.current.x = this.cursor.current.x + 1
-          }
-          break;
-        case 40:
-          if (this.cursor.current.y < 9) {
-            this.cursor.current.y = this.cursor.current.y + 1
-          }
-          break;
-        default:
-
-      }
-      this.printArrows(this.cursor.current.x, this.cursor.current.y)
-    }
-    if (this.firstKeyPress)
-      this.firstKeyPress = !this.firstKeyPress
-  }
-
+  // Función que pinta la celca enfocada
   focusCursor(x, y) {
-    let className = document.querySelectorAll("[data-x='" + x + "'][data-y='" + y + "']")[0].className
-    className = className.replace(/focused/g, '');
-    document.querySelectorAll("[data-x='" + this.cursor.previous.x + "'][data-y='" + this.cursor.previous.y + "']")[0].className = className
-    document.querySelectorAll("[data-x='" + this.cursor.previous.x + "'][data-y='" + this.cursor.previous.y + "']")[0].childNodes[1].style.display = 'none'
-    document.querySelectorAll("[data-x='" + x + "'][data-y='" + y + "']")[0].className += ' focused'
-    document.querySelectorAll("[data-x='" + x + "'][data-y='" + y + "']")[0].childNodes[1].style.display = 'block'
+    const cellFocused = document.querySelectorAll("[data-x='" + x + "'][data-y='" + y + "']")[0];
+    const prevCellFocused = document.querySelectorAll("[data-x='" + this.cursor.previous.x + "'][data-y='" + this.cursor.previous.y + "']")[0];
+
+    prevCellFocused.className = 'cell';
+    prevCellFocused.childNodes[1].style.display = 'none';
+
+    cellFocused.className += ' focused';
+    cellFocused.childNodes[1].style.display = 'block';
   }
 }
-window.onload = function () {
+
+window.onload = function() {
   const flechitas = new Flechitas();
 }

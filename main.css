@@ -22,11 +22,6 @@ body {
 	position: relative;
 }
 
-/*.grid .cell:hover {
-  border: 1px solid cyan;
-  border-radius: 5px;
-}*/
-
 .grid .cell:hover .coord-label {
   display: block;
 }
@@ -43,7 +38,7 @@ body {
 	display: none;
   text-align: center;
   background-color: cyan;
-  padding: 3px 0;
+  padding: 2px 0;
 }
 
 .grid .cell .coord-label:hover {
